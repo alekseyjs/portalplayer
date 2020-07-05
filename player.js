@@ -28,7 +28,7 @@ function format_seconds(s) {
 
 function timestamp_to_seconds(s) {
     var a = s.split(':');
-    return (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]); 
+    return (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
 }
 
 function parse_wiki_html() {
@@ -88,19 +88,19 @@ function parse_wiki_html() {
     Array.from(wiki_html[0].querySelectorAll('div[data-type], div[data-timestamp]')).map(parse_resources);
 }
 
-function parse_episode_list(response) {
-    var eplist_html = $(response.parse.text['*']);
-    var ul = document.querySelector('#episode-list .pane-content ul');
-    eplist_html.find('.episodes-table tr td:last-child a[href][title]').each(function() {
-        var title = this.attributes.title.value;
-        var url = window.location.pathname + '?ep=' + this.attributes.href.value.replace('/wiki/', '');
-        var li = document.createElement('li');
-        var a = document.createElement('a');
-        a.href = url;
-        a.text = title;
-        li.appendChild(a);
-        ul.appendChild(li);
-    });
+function parse_episode_list(res) {
+    let eplist_html = new DOMParser().parseFromString(res.parse.text['*'], 'text/html').body.firstChild;
+    let ep_list = document.querySelector('#episode-list .pane-content');
+    let origin = window.location.origin;
+    Array.from(eplist_html.querySelectorAll('.episodes-table tr td:last-child a[href][title]'))
+        .map(el => {
+            let div = document.createElement('div');
+            let a = document.createElement('a');
+            a.href = el.href.split(origin)[1].replace(/wiki\//, '?ep=');
+            a.innerText = el.title;
+            div.appendChild(a);
+            ep_list.appendChild(div);
+        });
 }
 
 function load_transcript() {
