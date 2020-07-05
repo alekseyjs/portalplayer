@@ -1,4 +1,4 @@
-var base_url = 'https://theportal.wiki'
+var base_url = 'https://theportal.wiki';
 var player = document.getElementById('player');
 var video_player = new Plyr('#video-player', {controls: []});
 var active_player = player;
@@ -20,8 +20,9 @@ var voice_span_regex = /<v ([^>]+)>/g;
 
 function format_seconds(s) {
     var t = new Date(s * 1000).toISOString().substr(11, 8);
-    if (t.substr(0, 3) == '00:')
+    if (t.substr(0, 3) === '00:') {
         t = t.substr(3);
+    }
     return t;
 }
 
@@ -37,12 +38,13 @@ function parse_wiki_html() {
         track.onload = load_transcript;
         track.src = track_url.attr('href');
         player.textTracks[0].mode = 'hidden';
-        if (track.src.toLowerCase().includes('video') || track.src.toLowerCase().includes('youtube'))
+        if (track.src.toLowerCase().includes('video') || track.src.toLowerCase().includes('youtube')) {
             track_source = 'youtube';
+        }
     }
     var youtube_a = wiki_html.find('a[href*="youtube.com"]');
     var youtube_url_valid = youtube_a.length && youtube_a.text().toLowerCase().includes('watch episode');
-    if (!force_audio && (!track_url.length || track_source == 'youtube' || force_video) && youtube_url_valid) {
+    if (!force_audio && (!track_url.length || track_source === 'youtube' || force_video) && youtube_url_valid) {
         var youtube_url = new URL(youtube_a.attr('href'));
         video_player.source = {
             type: 'video',
@@ -107,7 +109,7 @@ function load_transcript() {
     var prev_time = 0;
     var prev_speaker, cur_speaker;
     let non_vtt_speaker_regex = /^([A-Z].+ [A-Z].+:)/g;
-    [... player.textTracks[0].cues].forEach(cue => {
+    [...player.textTracks[0].cues].forEach(cue => {
         var voice_span_matches = new RegExp(voice_span_regex).exec(cue.text);
         if (voice_span_matches) {
             cur_speaker = voice_span_matches[1];
@@ -150,8 +152,9 @@ function load_transcript() {
 }
 
 $('#play').on('click', function() {
-    if (isNaN(active_player.duration))
+    if (isNaN(active_player.duration)) {
         return;
+    }
     if (active_player.paused) {
         active_player.play();
         $('#play-pause').removeClass('play').addClass('pause');
@@ -166,8 +169,9 @@ function player_can_play() {
 }
 
 function player_timeupdate() {
-    if (isNaN(active_player.duration) || progress_hover)
+    if (isNaN(active_player.duration) || progress_hover) {
         return;
+    }
     progress_bar.value = active_player.currentTime / active_player.duration;
     $('#player-time').text(format_seconds(active_player.currentTime) + ' / ' + format_seconds(active_player.duration));
     var active_resources = [];
@@ -176,8 +180,9 @@ function player_timeupdate() {
         var el = document.getElementById(resource.id);
         var active_timestamps = resource.timestamps.map(range => {
             let [start, end] = range;
-            if (start <= active_player.currentTime && (!end || end >= active_player.currentTime))
+            if (start <= active_player.currentTime && (!end || end >= active_player.currentTime)) {
                 return start;
+            }
             return false;
         }).filter(s => s).sort().reverse();
         if (active_timestamps.length) {
@@ -187,27 +192,29 @@ function player_timeupdate() {
         }
     });
     active_resources.sort((a, b) => a.last_timestamp - b.last_timestamp);
-    var last_active_resource = active_resources.filter(resource => $(resource).data('type') == 'resource').pop();
-    var last_active_note = active_resources.filter(resource => $(resource).data('type') == 'note').pop();
+    var last_active_resource = active_resources.filter(resource => $(resource).data('type') === 'resource').pop();
+    var last_active_note = active_resources.filter(resource => $(resource).data('type') === 'note').pop();
     document.querySelectorAll('#resources-pane .active, #notes-pane .active').forEach(el => {
-        if (el != last_active_resource && el != last_active_note)
+        if (el != last_active_resource && el != last_active_note) {
             el.classList.remove('active')
+        }
     });
     if (last_active_resource && last_active_resource != prev_active_resource) {
         $('#resources-pane').animate({
             scrollTop: last_active_resource.offsetTop - (last_active_resource.offsetParent.offsetHeight / 2) + (last_active_resource.offsetHeight / 2)
         }, 300);
     }
-    if (last_active_note && last_active_note != prev_active_note)
+    if (last_active_note && last_active_note != prev_active_note) {
         $('#notes-pane').animate({
             scrollTop: last_active_note.offsetTop - (last_active_note.offsetParent.offsetHeight / 2) + (last_active_note.offsetHeight / 2)
         }, 300);
+    }
     prev_active_resource = last_active_resource;
     prev_active_note = last_active_note;
-    if (player.textTracks[0].mode == 'hidden') {
+    if (player.textTracks[0].mode === 'hidden') {
         var active_spans = [];
         var last_active_cue;
-        [... player.textTracks[0].cues].forEach(cue => {
+        [...player.textTracks[0].cues].forEach(cue => {
             if (cue.startTime <= active_player.currentTime && cue.endTime >= active_player.currentTime) {
                 cue.transcript_span.classList.add('active');
                 active_spans.push(cue.transcript_span);
@@ -215,8 +222,9 @@ function player_timeupdate() {
             }
         });
         document.querySelectorAll('#transcript-pane span.active').forEach(span => {
-            if (active_spans.indexOf(span) == -1)
+            if (active_spans.indexOf(span) === -1) {
                 span.classList.remove('active')
+            }
         });
         if (scroll_track && last_active_cue && last_active_cue != prev_active_cue) {
             $('#transcript-pane').animate({
@@ -229,21 +237,24 @@ function player_timeupdate() {
 }
 function add_event_listeners() {
     var events_el = player;
-    if (active_player != player)
+    if (active_player != player) {
         events_el = video_player.media;
+    }
     events_el.addEventListener('canplay', player_can_play);
     events_el.addEventListener('timeupdate', player_timeupdate);
 }
 
 $('#progress-bar').click(function(e) {
-    if (isNaN(active_player.duration))
+    if (isNaN(active_player.duration)) {
         return;
+    }
     var percent = e.offsetX / this.offsetWidth;
     active_player.currentTime = percent * active_player.duration;
     progress_bar.value = percent / 100;
 }).mousemove(function(e) {
-    if (isNaN(active_player.duration))
+    if (isNaN(active_player.duration)) {
         return;
+    }
     progress_hover = true;
     var percent = e.offsetX / this.offsetWidth;
     $('#player-time').text(format_seconds(percent * active_player.duration) + ' / ' + format_seconds(active_player.duration));
@@ -256,15 +267,17 @@ $('#progress-bar').click(function(e) {
 $('.speed-btn').click(function(e) {
     e.preventDefault();
     var speed = parseFloat($('#speed').text());
-    if ($(this).hasClass('up'))
+    if ($(this).hasClass('up')) {
         speed += 0.25;
-    else
+    } else {
         speed -= 0.25;
+    }
     speed = Math.round( speed * 100 ) / 100;
-    if (active_player == player)
+    if (active_player === player) {
         active_player.playbackRate = speed;
-    else
+    } else {
         active_player.speed = speed;
+    }
     $('#speed').text(speed);
 });
 
