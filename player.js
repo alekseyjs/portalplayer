@@ -125,7 +125,7 @@ function load_transcript() {
         var ends_in_punctuation = ['.', '?'].indexOf(cue.text.trim().substr(-1)) !== -1;
         let first_letter_is_capital = first_letter === first_letter.toUpperCase();
         let diff_speaker = prev_speaker && cur_speaker !== prev_speaker;
-        if (prev_time && ((cue.startTime - prev_time >= transcript_paragraph_deadair && ends_in_punctuation != -1 && first_letter_is_capital) || diff_speaker)) {
+        if (prev_time && ((cue.startTime - prev_time >= transcript_paragraph_deadair && ends_in_punctuation !== -1 && first_letter_is_capital) || diff_speaker)) {
             parahraphs.push(parahraph);
             parahraph = [];
         }
@@ -195,16 +195,16 @@ function player_timeupdate() {
     var last_active_resource = active_resources.filter(resource => $(resource).data('type') === 'resource').pop();
     var last_active_note = active_resources.filter(resource => $(resource).data('type') === 'note').pop();
     document.querySelectorAll('#resources-pane .active, #notes-pane .active').forEach(el => {
-        if (el != last_active_resource && el != last_active_note) {
+        if (el !== last_active_resource && el !== last_active_note) {
             el.classList.remove('active')
         }
     });
-    if (last_active_resource && last_active_resource != prev_active_resource) {
+    if (last_active_resource && last_active_resource !== prev_active_resource) {
         $('#resources-pane').animate({
             scrollTop: last_active_resource.offsetTop - (last_active_resource.offsetParent.offsetHeight / 2) + (last_active_resource.offsetHeight / 2)
         }, 300);
     }
-    if (last_active_note && last_active_note != prev_active_note) {
+    if (last_active_note && last_active_note !== prev_active_note) {
         $('#notes-pane').animate({
             scrollTop: last_active_note.offsetTop - (last_active_note.offsetParent.offsetHeight / 2) + (last_active_note.offsetHeight / 2)
         }, 300);
@@ -226,7 +226,7 @@ function player_timeupdate() {
                 span.classList.remove('active')
             }
         });
-        if (scroll_track && last_active_cue && last_active_cue != prev_active_cue) {
+        if (scroll_track && last_active_cue && last_active_cue !== prev_active_cue) {
             $('#transcript-pane').animate({
                 scrollTop: last_active_cue.offsetTop - (last_active_cue.offsetParent.offsetHeight / 2) + (last_active_cue.offsetHeight / 2)
             }, 300);
@@ -237,7 +237,7 @@ function player_timeupdate() {
 }
 function add_event_listeners() {
     var events_el = player;
-    if (active_player != player) {
+    if (active_player !== player) {
         events_el = video_player.media;
     }
     events_el.addEventListener('canplay', player_can_play);
